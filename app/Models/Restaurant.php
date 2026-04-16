@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Resturaunt extends Model
+class Restaurant extends Model
 {
   use HasFactory;
   protected $fillable = [
@@ -18,7 +18,7 @@ class Resturaunt extends Model
 
   public function images()
   {
-    return $this->hasMany(Resturant_image::class, 'resturant_id');
+    return $this->hasMany(RestaurantImage::class, 'resturant_id');
   }
   public function state()
   {

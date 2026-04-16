@@ -19,7 +19,7 @@ class ReviewController extends Controller
   public function createReview(ReviewRequest $request, $reviewable_type, $reviewable_id)
   {
     try {
-      $request->validated($request->all());
+      $request->validated();
 
       if ($reviewable_type === 'place') {
         $reviewable = Place::findOrFail($reviewable_id);

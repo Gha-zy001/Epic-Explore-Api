@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Img_trip extends Model
+class TripImage extends Model
 {
   use HasFactory;
   protected $fillable = [
