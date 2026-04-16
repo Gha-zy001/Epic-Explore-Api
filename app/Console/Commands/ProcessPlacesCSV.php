@@ -4,7 +4,7 @@
 // use Illuminate\Console\Command;
 // use App\Models\Place;
 // use App\Models\Hotel;
-// use App\Models\Resturaunt;
+// use App\Models\Restaurant;
 
 // class ProcessPlacesCSVs extends Command
 // {

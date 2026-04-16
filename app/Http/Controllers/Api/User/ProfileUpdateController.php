@@ -13,7 +13,7 @@ class ProfileUpdateController extends Controller
   public function editProfile(ProfileRequest $request)
   {
     $user = $request->user();
-    $request->validated($request->all());
+    $request->validated();
     $path = 'laravel-cloud/profile-image';
     try {
       if ($request->hasFile('image')) {

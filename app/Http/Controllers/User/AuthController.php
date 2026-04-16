@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
   public function login(LoginUserRequest $request)
   {
-    $request->validated($request->all());
+    $request->validated();
     $user = User::where('email', $request->email)->first();
     if (!$user || !Hash::check($request->password, $user->password)) {
       return ApiTrait::errorMessage([], 'Credentials do not match', 401);
@@ -33,7 +33,7 @@ class AuthController extends Controller
 
   public function register(UserData $request)
   {
-    $request->validated($request->all());
+    $request->validated();
 
     if ($request->hasFile('image')) {
       $imageName = time() . '.' . $request->file('image')->getClientOriginalExtension();
