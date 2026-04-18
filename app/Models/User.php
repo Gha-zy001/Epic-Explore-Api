@@ -21,7 +21,9 @@ class User extends Authenticatable
     'email',
     'password',
     'image',
-    'user_id'
+    'user_id',
+    'exp',
+    'level'
   ];
 
   /**
@@ -77,5 +79,10 @@ class User extends Authenticatable
   public function getImageUrlAttribute()
   {
     return env('APP_URL') . '/storage/images/' . $this->image;
+  }
+
+  public function rewardLogs()
+  {
+    return $this->hasMany(RewardLog::class);
   }
 }
