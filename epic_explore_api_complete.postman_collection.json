@@ -1,0 +1,369 @@
+{
+    "info": {
+        "_postman_id": "85cead92-7f77-44dc-9235-b36fb51fe405",
+        "name": "Epic Explore Api - Complete",
+        "description": "Comprehensive API documentation for Epic Explore Api system. Includes all endpoints for Guiders and Users, organized by functionality.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Guider Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"phone_number\": \"0123456789\",\n    \"national_id\": \"12345678901234\",\n    \"password\": \"password\",\n    \"description\": \"Professional mountain guider\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/guider/register"
+                    }
+                },
+                {
+                    "name": "Verify OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"verification_code\": \"864600\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/guider/verify-otp"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"password\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/guider/login"
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": "http://localhost:8000/api/guider/logout"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane@example.com\",\n    \"password\": \"password\",\n    \"password_confirmation\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/user/register"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"jane@example.com\",\n    \"password\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/user/login"
+                    }
+                },
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "url": "http://localhost:8000/api/user/forgot_password"
+                    }
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "PUT",
+                        "url": "http://localhost:8000/api/user/reset_password"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Places",
+            "item": [
+                {
+                    "name": "All Places",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/place"
+                    }
+                },
+                {
+                    "name": "Show Place",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/place/show/1"
+                    }
+                },
+                {
+                    "name": "Places by State",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/place/Cairo"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Hotels",
+            "item": [
+                {
+                    "name": "All Hotels",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/hotel/get-hotels"
+                    }
+                },
+                {
+                    "name": "Show Hotel",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/hotel/get-hotel/1"
+                    }
+                },
+                {
+                    "name": "Hotels by State",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/hotel/Cairo"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Restaurants",
+            "item": [
+                {
+                    "name": "All Restaurants",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/restaurant/get-restaurants"
+                    }
+                },
+                {
+                    "name": "Show Restaurant",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/restaurant/get-restaurant/1"
+                    }
+                },
+                {
+                    "name": "Restaurants by State",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/restaurant/Cairo"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Banks",
+            "item": [
+                {
+                    "name": "All Banks",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/bank/get-banks"
+                    }
+                },
+                {
+                    "name": "Show Bank",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/bank/get-bank/1"
+                    }
+                },
+                {
+                    "name": "Banks by State",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/bank/Cairo"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Trips",
+            "item": [
+                {
+                    "name": "Get Trips",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/trip/get-trip"
+                    }
+                },
+                {
+                    "name": "Create Trip",
+                    "request": {
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"My Adventure\",\n    \"start_date\": \"2024-06-01\",\n    \"end_date\": \"2024-06-10\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://localhost:8000/api/user/trip/create-trip"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Favorites",
+            "item": [
+                {
+                    "name": "Get Favorites",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/favorite/getFavorites"
+                    }
+                },
+                {
+                    "name": "Add to Favorites",
+                    "request": {
+                        "method": "POST",
+                        "url": "http://localhost:8000/api/user/favorite/add/Place/1"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Guider Info",
+            "item": [
+                {
+                    "name": "All Guiders",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/guider_data/guider_all_data"
+                    }
+                },
+                {
+                    "name": "Specific Guider",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/guider_data/guider_specific/1"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Miscellaneous",
+            "item": [
+                {
+                    "name": "Home Content",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/home"
+                    }
+                },
+                {
+                    "name": "Recommendations",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/recommended"
+                    }
+                },
+                {
+                    "name": "Search",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost:8000/api/user/search?query=Cairo"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "token",
+            "value": "ENTER_TOKEN_HERE"
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    }
+}

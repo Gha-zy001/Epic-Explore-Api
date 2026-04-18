@@ -9,23 +9,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterGuiderRequest;
 use App\Http\Requests\LoginGuiderRequest;
-use App\Services\TwilioService;
+use App\Services\OtpService;
 
 class GuiderAuthController extends Controller
 {
 
-  protected $twilioService;
+  protected $otpService;
 
-  public function __construct(TwilioService $twilioService)
+  public function __construct(OtpService $otpService)
   {
-    $this->twilioService = $twilioService;
+    $this->otpService = $otpService;
   }
 
   public function register(RegisterGuiderRequest $request)
   {
     $request->validated();
-
-    $verificationCode = rand(100000, 999999);
 
     $guider = Guider::create([
       'name' => $request->name,
@@ -33,44 +31,45 @@ class GuiderAuthController extends Controller
       'phone_number' => $request->phone_number,
       'national_id' => $request->national_id,
       'password' => Hash::make($request->password),
-      'verification_code' => $verificationCode,
       'description' => $request->description,
     ]);
 
     try {
-      $this->twilioService->sendSms($guider->phone_number, 'Your OTP is ' . $verificationCode);
+      $this->otpService->send($guider->email);
     } catch (\Exception $e) {
       $guider->is_verified = false;
-      if (strpos($e->getMessage(), 'unverified') !== false) {
-        $guider->save();
-        return response()->json(['message' => 'Registration successful, but your phone number is not verified.'], 201);
-      }
+      // You might want to log this error
     }
 
     return response()->json([
-      'message' => 'Registration successful, please verify your phone number',
-      'phone' => $guider->phone_number,
+      'message' => 'Registration successful, please verify your email',
+      'email' => $guider->email,
     ], 201);
   }
 
   public function verifyOtp(Request $request)
   {
     $request->validate([
-      'phone_number' => 'required|string',
+      'email' => 'required|email',
       'verification_code' => 'required|numeric',
     ]);
 
-    $guider = Guider::where('phone_number', $request->phone_number)->first();
+    $otpValidation = $this->otpService->validate($request->email, $request->verification_code);
 
-    if (!$guider || $guider->verification_code != $request->verification_code) {
-      return response()->json(['message' => 'Invalid OTP'], 401);
+    if (!$otpValidation->status) {
+      return response()->json(['message' => 'Invalid or expired OTP'], 401);
+    }
+
+    $guider = Guider::where('email', $request->email)->first();
+
+    if (!$guider) {
+      return response()->json(['message' => 'Guider not found'], 404);
     }
 
     $guider->is_verified = true;
-    $guider->verification_code = null;
     $guider->save();
 
-    return response()->json(['message' => 'Phone number verified successfully'], 200);
+    return response()->json(['message' => 'Email verified successfully'], 200);
   }
 
 

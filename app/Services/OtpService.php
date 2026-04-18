@@ -4,10 +4,25 @@ namespace App\Services;
 
 use App\Models\Otp;
 
+use App\Notifications\OtpNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class OtpService
 {
+    /**
+     * Generate and send an OTP for an identifier (e.g., email).
+     */
+    public function send(string $identifier, string $type = 'numeric', int $length = 6, int $expiry = 15)
+    {
+        $otp = $this->generate($identifier, $type, $length, $expiry);
+        
+        // Send notification
+        Notification::route('mail', $identifier)->notify(new OtpNotification($otp->token));
+
+        return $otp;
+    }
+
     /**
      * Generate an OTP for an identifier (e.g., email).
      */

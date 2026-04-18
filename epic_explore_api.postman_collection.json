@@ -1,0 +1,166 @@
+{
+    "info": {
+        "_postman_id": "85cead92-7f77-44dc-9235-b36fb51fe405",
+        "name": "Epic Explore Api",
+        "description": "API documentation for Epic Explore Api, featuring SMTP-based OTP verification and dual auth system for Guiders and Users.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Guider Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"phone_number\": \"0123456789\",\n    \"national_id\": \"12345678901234\",\n    \"password\": \"password\",\n    \"description\": \"Professional mountain guider\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/guider/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "guider", "register"]
+                        },
+                        "description": "Registers a new guider and sends an OTP verification code via email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"verification_code\": \"864600\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/guider/verify-otp",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "guider", "verify-otp"]
+                        },
+                        "description": "Verifies the guider's email using the OTP code received."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"axxgha.zy01@gmail.com\",\n    \"password\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/guider/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "guider", "login"]
+                        },
+                        "description": "Authenticates a guider and returns a Sanctum token."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "User Auth",
+            "item": [
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/forgot_password",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "user", "forgot_password"]
+                        },
+                        "description": "Initiates password reset by sending an OTP via email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user@example.com\",\n    \"otp\": \"123456\",\n    \"password\": \"newpassword\",\n    \"password_confirmation\": \"newpassword\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/reset_password",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "user", "reset_password"]
+                        },
+                        "description": "Resets the user's password using the provided OTP."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000"
+        }
+    ]
+}
