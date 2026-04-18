@@ -17,6 +17,9 @@ use App\Http\Controllers\Api\User\SearchController;
 use App\Http\Controllers\User\AuthController;
 use App\Http\Controllers\User\ForgetPasswordController;
 use App\Http\Controllers\User\ResetPasswordController;
+use App\Http\Controllers\Api\User\RankingController;
+use App\Http\Controllers\Api\User\DiscoverController;
+use App\Http\Controllers\Api\User\QuestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,11 +48,16 @@ Route::prefix('user')->group(function () {
 
   Route::middleware('auth:sanctum')->get('/recommended', [RecommendationController::class, 'recommendPlaces']);
   Route::middleware('auth:sanctum')->get('/home', [HomeController::class, 'homeContent']);
+  Route::middleware('auth:sanctum')->get('/leaderboard', [RankingController::class, 'index']);
+  Route::middleware('auth:sanctum')->get('/discover', [DiscoverController::class, 'index']);
+  Route::middleware('auth:sanctum')->get('/quests', [QuestController::class, 'index']);
+  Route::middleware('auth:sanctum')->post('/quests/accept/{questId}', [QuestController::class, 'accept']);
 
   //Place routes
   Route::middleware('auth:sanctum')->prefix('place')->controller(PlaceController::class)->group(function () {
     Route::get('/', 'index');
     Route::get('/show/{place}', 'show');
+    Route::post('/check-in', 'checkIn');
     Route::get('/{stateName}', 'getPlacesByState');
   });
 

@@ -51,7 +51,9 @@ class ProfileUpdateController extends Controller
       'name' => $user->name,
       'email' => $user->email,
       'avatar' => $user->image,
+      'exp' => $user->exp,
+      'level' => $user->level,
     ];
-    return $userData;
+    return ApiTrait::data(compact('userData'));
   }
 }

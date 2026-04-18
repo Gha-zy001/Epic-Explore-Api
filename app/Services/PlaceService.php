@@ -5,11 +5,20 @@ namespace App\Services;
 use App\Models\Place;
 use App\Models\Hotel;
 use App\Models\State;
+use App\Models\Visit;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class PlaceService extends BaseService
 {
     protected string $cachePrefix = 'places';
+    protected PointService $pointService;
+
+    public function __construct(PointService $pointService)
+    {
+        $this->pointService = $pointService;
+    }
 
     /**
      * Get all places and hotels for home/index.
@@ -81,5 +90,35 @@ class PlaceService extends BaseService
                     ];
                 })->toArray();
         });
+    }
+
+    /**
+     * Check-in the authenticated user to a place.
+     */
+    public function checkInAuthUser(int $placeId, ?float $lat = null, ?float $lng = null)
+    {
+        return $this->checkIn(Auth::user(), $placeId, $lat, $lng);
+    }
+
+    /**
+     * Check-in a user to a place.
+     */
+    public function checkIn(User $user, int $placeId, ?float $lat = null, ?float $lng = null)
+    {
+        $place = Place::findOrFail($placeId);
+
+        // Record the visit
+        $visit = Visit::create([
+            'user_id' => $user->id,
+            'place_id' => $placeId,
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'points_awarded' => 50, // Standard 50 XP for check-in
+        ]);
+
+        // Award XP
+        $this->pointService->awardExperience($user, 50, "Checked in to {$place->name}", 'xp', $visit);
+
+        return $visit;
     }
 }

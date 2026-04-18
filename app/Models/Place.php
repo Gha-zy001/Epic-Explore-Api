@@ -37,4 +37,9 @@ class Place extends Model
   {
     return $this->morphMany(Review::class, 'reviewable');
   }
+
+  public function visits()
+  {
+    return $this->hasMany(Visit::class);
+  }
 }

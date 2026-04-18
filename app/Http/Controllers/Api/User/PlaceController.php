@@ -69,5 +69,28 @@ class PlaceController extends Controller
       return ApiTrait::errorMessage([], 'An error occurred', 422);
     }
   }
-}
 
+  /**
+   * Check-in to a place.
+   */
+  public function checkIn(Request $request)
+  {
+    $request->validate([
+      'place_id' => 'required|exists:places,id',
+      'latitude' => 'nullable|numeric',
+      'longitude' => 'nullable|numeric',
+    ]);
+
+    try {
+      $visit = $this->placeService->checkInAuthUser(
+        $request->place_id,
+        $request->latitude,
+        $request->longitude
+      );
+
+      return ApiTrait::data(['visit' => $visit, 'message' => 'Check-in successful! +50 XP awarded.']);
+    } catch (\Throwable $th) {
+      return ApiTrait::errorMessage([], $th->getMessage(), 500);
+    }
+  }
+}
