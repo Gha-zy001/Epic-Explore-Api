@@ -68,8 +68,6 @@ Follow these steps to set up the project locally.
 For easy testing and exploration of the API endpoints, Postman collections are included in the root directory:
 
 - `epic_explore_api_full.postman_collection.json` (Recommended: Includes all endpoints)
-- `epic_explore_api_complete.postman_collection.json`
-- `epic_explore_api.postman_collection.json`
 
 **How to import into Postman:**
 
