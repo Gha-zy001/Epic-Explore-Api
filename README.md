@@ -1,6 +1,6 @@
 # Epic Explore API
 
-A Laravel-based API featuring a robust gamification system (XP, Levels, Quests) and exploration mechanics. This project provides a powerful backend for gamified user experiences, integrating modern PHP and architectural patterns.
+A Laravel-based API featuring a robust gamification system (XP, Levels, Quests) and exploration mechanics. This project provides a powerful backend for gamified user experiences.
 
 ## Features
 
