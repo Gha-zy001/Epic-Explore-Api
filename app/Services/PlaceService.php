@@ -117,7 +117,7 @@ class PlaceService extends BaseService
         ]);
 
         // Award XP
-        $this->pointService->awardExperience($user, 50, "Checked in to {$place->name}", 'xp', $visit);
+        $this->pointService->awardExperience($user, 50, "Checked in to {$place->name}", 'xp', 'visits', $visit);
 
         return $visit;
     }

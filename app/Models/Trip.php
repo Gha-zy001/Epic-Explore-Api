@@ -25,6 +25,6 @@ class Trip extends Model
   }
   public function images()
   {
-    return $this->hasMany(Img_trip::class, 'trip_id');
+    return $this->hasMany(ImgTrip::class, 'trip_id');
   }
 }

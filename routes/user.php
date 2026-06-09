@@ -35,15 +35,15 @@ use App\Http\Controllers\Api\User\QuestController;
 
 Route::prefix('user')->group(function () {
   //Auth
-  Route::post('/register', [AuthController::class, 'register']);
-  Route::post('/login', [AuthController::class, 'login']);
+  Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+  Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
   Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
   Route::middleware('auth:sanctum')->post('/edit_profile', [ProfileUpdateController::class, 'editProfile']);
   Route::middleware('auth:sanctum')->get('/show_profile', [ProfileUpdateController::class, 'show']);
   //Reset_Password
-  Route::post('/forgot_password', [ForgetPasswordController::class, 'fogotPassword']);
-  Route::put('/reset_password', [ResetPasswordController::class, 'reset']);
-  Route::put('/reset_pass', [ResetPasswordController::class, 'resets']);
+  Route::post('/forgot_password', [ForgetPasswordController::class, 'fogotPassword'])->middleware('throttle:3,1');
+  Route::put('/reset_password', [ResetPasswordController::class, 'reset'])->middleware('throttle:3,1');
+  Route::put('/reset_pass', [ResetPasswordController::class, 'resets'])->middleware('throttle:3,1');
 
 
   Route::middleware('auth:sanctum')->get('/recommended', [RecommendationController::class, 'recommendPlaces']);

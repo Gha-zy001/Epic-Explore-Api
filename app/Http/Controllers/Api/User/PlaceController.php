@@ -7,6 +7,7 @@ use App\Http\Resources\PlaceResource;
 use App\Traits\ApiTrait;
 use App\Services\PlaceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PlaceController extends Controller
 {
@@ -17,62 +18,56 @@ class PlaceController extends Controller
     $this->placeService = $placeService;
   }
 
-  /**
-   * Display a listing of the resource.
-   */
   public function index()
   {
     try {
       $data = $this->placeService->getAllPlacesAndHotels();
-      
+
       if (!$data) {
-        return ApiTrait::errorMessage([], 'No Places or Hotels Available', 422);
+        return ApiTrait::errorMessage([], 'No Places or Hotels Available', 404);
       }
 
-      return $data;
+      return ApiTrait::data($data, 'Places and hotels fetched', 200);
     } catch (\Throwable $th) {
-      return ApiTrait::errorMessage([], 'An error occurred', 500);
+      Log::error('PlaceController@index failed', ['error' => $th->getMessage()]);
+      return ApiTrait::errorMessage([], 'Failed to load places', 500);
     }
   }
 
-  /**
-   * Display the specified resource.
-   */
   public function show($id)
   {
     try {
-      $place = $this->placeService->getPlaceById($id);
+      $place = $this->placeService->getPlaceById((int) $id);
       if ($place) {
         $placeById = new PlaceResource($place);
         return ApiTrait::data(compact('placeById'));
       }
       return ApiTrait::errorMessage([], 'Place not found', 404);
     } catch (\Throwable $th) {
-      return ApiTrait::errorMessage([], 'An error occurred', 500);
+      Log::error('PlaceController@show failed', ['error' => $th->getMessage(), 'id' => $id]);
+      return ApiTrait::errorMessage([], 'Failed to load place', 500);
     }
   }
 
-  /**
-   * Get places by state name.
-   */
   public function getPlacesByState(Request $request, $stateName)
   {
     try {
       $places = $this->placeService->getPlacesByState($stateName);
-      
+
       if ($places === null) {
-          return response()->json(['error' => 'State not found'], 404);
+        return ApiTrait::errorMessage([], 'State not found', 404);
       }
 
-      return compact('places');
+      return ApiTrait::data(compact('places'), 'Places fetched by state', 200);
     } catch (\Throwable $th) {
-      return ApiTrait::errorMessage([], 'An error occurred', 422);
+      Log::error('PlaceController@getPlacesByState failed', [
+        'error' => $th->getMessage(),
+        'state' => $stateName,
+      ]);
+      return ApiTrait::errorMessage([], 'Failed to load places', 500);
     }
   }
 
-  /**
-   * Check-in to a place.
-   */
   public function checkIn(Request $request)
   {
     $request->validate([
@@ -83,14 +78,19 @@ class PlaceController extends Controller
 
     try {
       $visit = $this->placeService->checkInAuthUser(
-        $request->place_id,
+        (int) $request->place_id,
         $request->latitude,
         $request->longitude
       );
 
-      return ApiTrait::data(['visit' => $visit, 'message' => 'Check-in successful! +50 XP awarded.']);
+      return ApiTrait::data(['visit' => $visit], 'Check-in successful! +50 XP awarded.', 200);
     } catch (\Throwable $th) {
-      return ApiTrait::errorMessage([], $th->getMessage(), 500);
+      Log::error('PlaceController@checkIn failed', [
+        'error' => $th->getMessage(),
+        'user_id' => auth()->id(),
+        'place_id' => $request->place_id,
+      ]);
+      return ApiTrait::errorMessage([], 'Check-in failed', 500);
     }
   }
 }

@@ -38,6 +38,6 @@ class QuestController extends Controller
 
         $user->quests()->attach($questId, ['status' => 'active', 'progress' => 0]);
 
-        return ApiTrait::successMessage('Quest accepted!', 200);
+        return ApiTrait::data(['message' => 'Quest accepted!'], 200);
     }
 }

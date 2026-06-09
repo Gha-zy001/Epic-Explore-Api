@@ -1,0 +1,8 @@
+id
+user_id
+place_id
+latitude
+longitude
+points_awarded
+created_at
+updated_at

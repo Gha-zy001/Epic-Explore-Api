@@ -12,7 +12,6 @@ class Place extends Model
   protected $fillable = [
     'name',
     'state_id',
-    'place_id',
     'description',
     'address'
   ];

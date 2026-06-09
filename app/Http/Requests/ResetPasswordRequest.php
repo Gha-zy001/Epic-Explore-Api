@@ -28,4 +28,30 @@ class ResetPasswordRequest extends FormRequest
       'password' => ['required', 'confirmed', RulesPassword::defaults()],
     ];
   }
+
+  public function bodyParameters(): array
+  {
+    return [
+      'email' => [
+        'description' => 'The user\'s email address.',
+        'example' => 'john@example.com',
+        'required' => true,
+      ],
+      'otp' => [
+        'description' => 'One-time password sent to email.',
+        'example' => '123456',
+        'required' => true,
+      ],
+      'password' => [
+        'description' => 'New password.',
+        'example' => 'newSecurePassword123',
+        'required' => true,
+      ],
+      'password_confirmation' => [
+        'description' => 'Password confirmation (must match password).',
+        'example' => 'newSecurePassword123',
+        'required' => true,
+      ],
+    ];
+  }
 }

@@ -3,11 +3,42 @@
 namespace App\Services;
 
 use App\Models\Trip;
+use App\Services\PointService;
 use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Configuration\Configuration;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TripService extends BaseService
 {
     protected string $cachePrefix = 'trips';
+    protected PointService $pointService;
+
+    public function __construct(PointService $pointService)
+    {
+        $this->pointService = $pointService;
+        $this->configureCloudinary();
+    }
+
+    /**
+     * Configure Cloudinary SDK from .env values.
+     */
+    protected function configureCloudinary(): void
+    {
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $apiKey = env('CLOUDINARY_API_KEY');
+        $apiSecret = env('CLOUDINARY_API_SECRET');
+
+        if ($cloudName && $apiKey && $apiSecret) {
+            Configuration::instance([
+                'cloud' => [
+                    'cloud_name' => $cloudName,
+                    'api_key' => $apiKey,
+                    'api_secret' => $apiSecret,
+                ],
+            ]);
+        }
+    }
 
     /**
      * Get all trips for the authenticated user.
@@ -18,11 +49,15 @@ class TripService extends BaseService
     }
 
     /**
-     * Get a specific trip for the authenticated user.
+     * Get a specific trip belonging to the user.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function getSpecificTrip(int $userId, int $tripId)
     {
-        return Trip::where('user_id', $userId)->where('id', $tripId)->first();
+        return Trip::where('user_id', $userId)
+            ->where('id', $tripId)
+            ->firstOrFail();
     }
 
     /**
@@ -30,66 +65,101 @@ class TripService extends BaseService
      */
     public function createTrip(array $data)
     {
-        return Trip::create($data);
+        $trip = Trip::create($data);
+
+        // Award XP for creating trip
+        $this->pointService->awardExperience(
+            $trip->user,
+            100,
+            "Created trip: {$trip->title}",
+            'xp',
+            'trips',
+            $trip
+        );
+
+        return $trip;
     }
 
     /**
-     * Update an existing trip.
+     * Update an existing trip that belongs to the user.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function updateTrip(int $id, array $data)
+    public function updateTrip(int $userId, int $id, array $data)
     {
-        $trip = Trip::find($id);
-        if ($trip) {
-            $trip->update($data);
-            return $trip;
+        $trip = Trip::where('user_id', $userId)->where('id', $id)->first();
+
+        if (!$trip) {
+            return null;
         }
-        return null;
+
+        $trip->update($data);
+
+        return $trip;
     }
 
     /**
-     * Delete a trip.
+     * Delete a trip that belongs to the user.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function deleteTrip(int $id)
+    public function deleteTrip(int $userId, int $id)
     {
-        $trip = Trip::find($id);
-        if ($trip) {
-            return $trip->delete();
+        $trip = Trip::where('user_id', $userId)->where('id', $id)->first();
+
+        if (!$trip) {
+            return false;
         }
-        return false;
+
+        return (bool) $trip->delete();
     }
 
     /**
-     * Upload images for a trip.
+     * Upload images for a trip the user owns.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws \RuntimeException
      */
-    public function uploadTripImages(int $tripId, array $files)
+    public function uploadTripImages(int $userId, int $tripId, array $files)
     {
-        $config = "CLOUDINARY_URL=cloudinary://215749298241811:gxhrmBq4FeJQnJI2UZbiHwpVSdU@dkduz7amh";
-        $trip = Trip::findOrFail($tripId);
-        $path = 'laravel-cloud/trips-image';
-        
+        $trip = Trip::where('user_id', $userId)->where('id', $tripId)->first();
+
+        if (!$trip) {
+            throw new \RuntimeException('Trip not found or access denied');
+        }
+
+        $folder = env('CLOUDINARY_FOLDER', 'laravel-cloud/trips-image');
         $imageUrls = [];
+
         foreach ($files as $file) {
-            $file_name = time() . '.' . $file->getClientOriginalExtension();
-            $fileName = pathinfo($file_name, PATHINFO_FILENAME);
-            $publicId = date('Y-m-d_His') . '_' . $fileName;
-            
-            $upload = (new UploadApi($config))->upload(
-                $file->getRealPath(),
-                [
-                    "public_id" => $publicId,
-                    "folder" => $path
-                ]
-            );
-            $imageUrls[] = $upload['secure_url'];
+            $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = Str::slug($fileName) ?: 'image';
+            $publicId = now()->format('Y-m-d_His') . '_' . $safeName . '_' . Str::random(6);
+
+            try {
+                $upload = (new UploadApi())->upload($file->getRealPath(), [
+                    'public_id' => $publicId,
+                    'folder' => $folder,
+                ]);
+                $imageUrls[] = $upload['secure_url'];
+            } catch (\Throwable $e) {
+                Log::error('Cloudinary upload failed', [
+                    'trip_id' => $tripId,
+                    'user_id' => $userId,
+                    'error' => $e->getMessage(),
+                ]);
+                throw new \RuntimeException('Image upload failed: ' . $e->getMessage());
+            }
         }
 
         foreach ($imageUrls as $imageUrl) {
             $trip->images()->create([
-                "trip_id" => $tripId,
-                "data" => $imageUrl,
+                'trip_id' => $tripId,
+                'data' => $imageUrl,
             ]);
         }
-        
-        return count($imageUrls) > 0;
+
+        return count($imageUrls);
     }
 }

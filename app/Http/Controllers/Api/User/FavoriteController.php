@@ -11,9 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use App\Traits\ApiTrait;
 use App\Models\Hotel;
 use Illuminate\Support\Facades\Cache;
+use App\Services\PointService;
 
 class FavoriteController extends Controller
 {
+    protected PointService $pointService;
+
+    public function __construct(PointService $pointService)
+    {
+        $this->pointService = $pointService;
+    }
+
   /**
    * Display a listing of the resource.
    */
@@ -29,7 +37,7 @@ class FavoriteController extends Controller
         return ApiTrait::errorMessage([], 'Invalid favoritable type', 422);
       }
 
-      Favorite::create([
+      $favorite = Favorite::create([
         'user_id' => auth()->user()->id,
         'favoritable_id' => $favoritableId,
         'favoritable_type' => get_class($favoritable),
@@ -37,6 +45,17 @@ class FavoriteController extends Controller
       Cache::forget('favorites_' . auth()->user()->id);
       $favorites = Favorite::where('user_id', auth()->user()->id)->get();
       Cache::put('favorites_' . auth()->user()->id, $favorites, now()->addMinutes(30));
+
+      // Award XP for favorite
+      $this->pointService->awardExperience(
+          auth()->user(),
+          10,
+          "Added {$favoritable->name} to favorites",
+          'xp',
+          'favorites',
+          $favorite
+      );
+
       return ApiTrait::successMessage('Successfully added to favorites', 200);
     } catch (\Throwable $th) {
       return ApiTrait::errorMessage([], 'Fail', 422);

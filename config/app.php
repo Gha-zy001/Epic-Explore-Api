@@ -168,7 +168,9 @@ return [
     // App\Providers\BroadcastServiceProvider::class,
     App\Providers\EventServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
-    CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class
+    CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider::class,
+    App\Providers\Filament\AdminPanelProvider::class,
+    Spatie\Permission\PermissionServiceProvider::class,
   ])->toArray(),
 
   /*

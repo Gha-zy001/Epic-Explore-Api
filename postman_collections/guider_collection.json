@@ -1,0 +1,202 @@
+{
+    "variable": [
+        {
+            "id": "baseUrl",
+            "key": "baseUrl",
+            "type": "string",
+            "name": "string",
+            "value": "http://localhost:8000"
+        },
+        {
+            "id": "authToken",
+            "key": "authToken",
+            "type": "string",
+            "name": "string",
+            "value": ""
+        }
+    ],
+    "info": {
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "name": "Epic Explore API - Guider Module",
+        "description": "Guider authentication, OTP verification, contact requests"
+    },
+    "item": [
+        {
+            "name": "POST guider/register",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "multipart/form-data"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "guider",
+                        "register"
+                    ],
+                    "variable": []
+                },
+                "description": "",
+                "body": {
+                    "mode": "formdata",
+                    "formdata": []
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "POST guider/login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "guider",
+                        "login"
+                    ],
+                    "variable": []
+                },
+                "description": "",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "POST guider/verify-otp",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "guider",
+                        "verify-otp"
+                    ],
+                    "variable": []
+                },
+                "description": "",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "POST guider/logout",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "guider",
+                        "logout"
+                    ],
+                    "variable": []
+                },
+                "description": "",
+                "body": {
+                    "mode": "raw",
+                    "raw": "{}"
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "GET guider/get_contact",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{authToken}}"
+                    }
+                ],
+                "url": {
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "guider",
+                        "get_contact"
+                    ],
+                    "variable": []
+                },
+                "description": ""
+            },
+            "response": []
+        }
+    ]
+}

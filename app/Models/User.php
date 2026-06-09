@@ -21,7 +21,6 @@ class User extends Authenticatable
     'email',
     'password',
     'image',
-    'user_id',
     'exp',
     'level'
   ];
@@ -44,6 +43,8 @@ class User extends Authenticatable
   protected $casts = [
     'email_verified_at' => 'datetime',
     'password' => 'hashed',
+    'exp' => 'integer',
+    'level' => 'integer',
   ];
 
   protected $appends = ['image_url'];
@@ -84,5 +85,12 @@ class User extends Authenticatable
   public function rewardLogs()
   {
     return $this->hasMany(RewardLog::class);
+  }
+
+  public function quests()
+  {
+    return $this->belongsToMany(Quest::class, 'user_quests')
+      ->withPivot('progress', 'status')
+      ->withTimestamps();
   }
 }

@@ -11,17 +11,18 @@ class DiscoverController extends Controller
 {
     public function index(Request $request)
     {
-        // Popular: Top 10 by review count (simulated by random for now, or just limit)
+        // Popular: Top 10 by review count
         $popular = Place::withCount('reviews')
             ->orderBy('reviews_count', 'desc')
             ->limit(5)
             ->get();
 
-        // Hidden Gems: Less than 5 reviews but highly rated (simulated)
+        // Hidden Gems: Less than 5 reviews - filter in PHP for SQLite compatibility
         $hiddenGems = Place::withCount('reviews')
-            ->having('reviews_count', '<', 5)
-            ->limit(5)
-            ->get();
+            ->get()
+            ->filter(fn($place) => $place->reviews_count < 5)
+            ->take(5)
+            ->values();
 
         // Nearby: Simulated for now
         $nearby = Place::inRandomOrder()->limit(5)->get();

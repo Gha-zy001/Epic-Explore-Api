@@ -8,10 +8,18 @@ use App\Models\Place;
 use App\Models\Hotel;
 use App\Models\Review;
 use App\Traits\ApiTrait;
+use App\Services\PointService;
 
 
 class ReviewController extends Controller
 {
+  protected PointService $pointService;
+
+  public function __construct(PointService $pointService)
+  {
+      $this->pointService = $pointService;
+  }
+
   /**
    * Display a listing of the resource.
    */
@@ -29,13 +37,24 @@ class ReviewController extends Controller
         return ApiTrait::errorMessage([], 'Invalid reviewable type', 422);
       }
 
-      Review::create([
+      $review = Review::create([
         'user_id' => auth()->user()->id,
         'star_rating' => $request->star_rating,
         'comments' => $request->comments,
         'reviewable_id' => $reviewable_id,
         'reviewable_type' => get_class($reviewable)
       ]);
+
+      // Award XP for review
+      $this->pointService->awardExperience(
+          auth()->user(),
+          25,
+          "Reviewed {$reviewable->name}",
+          'xp',
+          'reviews',
+          $review
+      );
+
       return ApiTrait::successMessage('Your review has been submitted Successfully', 200);
     } catch (\Throwable $th) {
       return ApiTrait::errorMessage([], 'Fail', 422);

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\OtpService;
 use App\Traits\ApiTrait;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class ForgetPasswordController extends Controller
 {
@@ -19,19 +21,24 @@ class ForgetPasswordController extends Controller
 
   public function fogotPassword(Request $request)
   {
-    $request->validate([
-      'email' => 'required|email',
-    ]);
+    try {
+      $request->validate([
+        'email' => 'required|email',
+      ]);
 
-    $user = User::where('email', $request->email)->first();
-    
-    if (!$user) {
-        return ApiTrait::errorMessage([], 'User not found', 404);
+      $user = User::where('email', $request->email)->first();
+      
+      if (!$user) {
+          return ApiTrait::errorMessage([], 'User not found', 404);
+      }
+
+      $this->otpService->send($request->email);
+      
+      return ApiTrait::data([], "OTP sent successfully", 200);
+    } catch (Exception $e) {
+      Log::error('Forgot password error', ['error' => $e->getMessage(), 'email' => $request->email]);
+      return ApiTrait::errorMessage([], 'Failed to send OTP. Please try again.', 500);
     }
-
-    $this->otpService->send($request->email);
-    
-    return ApiTrait::data([], "OTP sent successfully", 200);
   }
 }
 
