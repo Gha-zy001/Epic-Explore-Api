@@ -43,6 +43,7 @@ class FavoriteController extends Controller
         'favoritable_type' => get_class($favoritable),
       ]);
       Cache::forget('favorites_' . auth()->user()->id);
+      Cache::forget("user." . auth()->user()->id . ".favorites");
       $favorites = Favorite::where('user_id', auth()->user()->id)->get();
       Cache::put('favorites_' . auth()->user()->id, $favorites, now()->addMinutes(30));
 
@@ -69,6 +70,7 @@ class FavoriteController extends Controller
         ->where('favoritable_id', $favoritableId)
         ->delete();
       Cache::forget('favorites_' . auth()->user()->id);
+      Cache::forget("user." . auth()->user()->id . ".favorites");
       $favorites = Favorite::where('user_id', auth()->user()->id)->get();
       Cache::put('favorites_' . auth()->user()->id, $favorites, now()->addMinutes(30));
       return ApiTrait::successMessage('Successfully deleted', 200);

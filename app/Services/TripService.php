@@ -45,7 +45,9 @@ class TripService extends BaseService
      */
     public function getUserTrips(int $userId)
     {
-        return Trip::where('user_id', $userId)->get();
+        return $this->remember("user.{$userId}.all", function () use ($userId) {
+            return Trip::where('user_id', $userId)->get();
+        }, 3600);
     }
 
     /**
@@ -55,9 +57,11 @@ class TripService extends BaseService
      */
     public function getSpecificTrip(int $userId, int $tripId)
     {
-        return Trip::where('user_id', $userId)
-            ->where('id', $tripId)
-            ->firstOrFail();
+        return $this->remember("user.{$userId}.trip.{$tripId}", function () use ($userId, $tripId) {
+            return Trip::where('user_id', $userId)
+                ->where('id', $tripId)
+                ->firstOrFail();
+        }, 3600);
     }
 
     /**
@@ -66,6 +70,9 @@ class TripService extends BaseService
     public function createTrip(array $data)
     {
         $trip = Trip::create($data);
+
+        // Invalidate cache
+        $this->forget("user.{$data['user_id']}.all");
 
         // Award XP for creating trip
         $this->pointService->awardExperience(
@@ -96,6 +103,10 @@ class TripService extends BaseService
 
         $trip->update($data);
 
+        // Invalidate caches
+        $this->forget("user.{$userId}.all");
+        $this->forget("user.{$userId}.trip.{$id}");
+
         return $trip;
     }
 
@@ -112,7 +123,14 @@ class TripService extends BaseService
             return false;
         }
 
-        return (bool) $trip->delete();
+        $deleted = $trip->delete();
+
+        if ($deleted) {
+            $this->forget("user.{$userId}.all");
+            $this->forget("user.{$userId}.trip.{$id}");
+        }
+
+        return (bool) $deleted;
     }
 
     /**

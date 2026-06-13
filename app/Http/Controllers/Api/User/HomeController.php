@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\User\RecommendationController;
 use App\Models\Place;
 use App\Traits\ApiTrait;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -17,12 +18,16 @@ class HomeController extends Controller
     $recommendationsData = (new RecommendationController())
       ->recommendPlaces();
       
-    $places = Place::limit(10)->get();
+    $places = Cache::remember('home.places', 3600, function () {
+        return Place::limit(10)->get();
+    });
     
-    $recentActivity = $user->rewardLogs()
-      ->orderBy('created_at', 'desc')
-      ->limit(5)
-      ->get();
+    $recentActivity = Cache::remember("home.recent_activity.{$user->id}", 3600, function () use ($user) {
+        return $user->rewardLogs()
+          ->orderBy('created_at', 'desc')
+          ->limit(5)
+          ->get();
+    });
 
     $data = [
       'user_summary' => [
@@ -34,8 +39,8 @@ class HomeController extends Controller
       'recommendations' => $recommendationsData,
       'places' => $places,
       'recent_activity' => $recentActivity,
-      'streak' => 0, // Placeholder
-      'daily_quests' => [], // Placeholder
+      'streak' => 0,
+      'daily_quests' => [],
     ];
     
     return ApiTrait::data($data, '', 200);

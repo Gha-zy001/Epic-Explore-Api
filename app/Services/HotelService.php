@@ -15,7 +15,10 @@ class HotelService extends BaseService
      */
     public function getAllHotels(int $perPage = 10)
     {
-        return Hotel::paginate($perPage);
+        $page = request()->get('page', 1);
+        return $this->remember("all.page.{$page}.perPage.{$perPage}", function () use ($perPage) {
+            return Hotel::paginate($perPage);
+        }, 3600);
     }
 
     /**
@@ -23,7 +26,9 @@ class HotelService extends BaseService
      */
     public function getHotelById(int $id)
     {
-        return Hotel::find($id);
+        return $this->remember("id.{$id}", function () use ($id) {
+            return Hotel::find($id);
+        }, 3600);
     }
 
     /**

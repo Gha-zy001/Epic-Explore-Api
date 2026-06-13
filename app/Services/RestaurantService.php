@@ -15,7 +15,10 @@ class RestaurantService extends BaseService
      */
     public function getAllRestaurants(int $perPage = 10)
     {
-        return Restaurant::paginate($perPage);
+        $page = request()->get('page', 1);
+        return $this->remember("all.page.{$page}.perPage.{$perPage}", function () use ($perPage) {
+            return Restaurant::paginate($perPage);
+        }, 3600);
     }
 
     /**
@@ -23,7 +26,9 @@ class RestaurantService extends BaseService
      */
     public function getRestaurantById(int $id)
     {
-        return Restaurant::find($id);
+        return $this->remember("id.{$id}", function () use ($id) {
+            return Restaurant::find($id);
+        }, 3600);
     }
 
     /**

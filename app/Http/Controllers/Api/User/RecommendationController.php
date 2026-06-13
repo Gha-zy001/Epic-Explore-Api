@@ -19,33 +19,41 @@ class RecommendationController extends Controller
     try {
       $user = User::find(Auth::user()->id);
       
-      // Try AI Recommendations first
       $aiService = app(AiRecommendationService::class);
-      $aiRecommendations = $aiService->getRecommendations($user);
+      $aiRecommendations = Cache::remember("recommendations.user.{$user->id}.ai", 3600, function () use ($aiService, $user) {
+          return $aiService->getRecommendations($user);
+      });
       
       if ($aiRecommendations && $aiRecommendations->isNotEmpty()) {
           $recommendedData = PlaceResource::collection($aiRecommendations);
           return ApiTrait::data(compact('recommendedData'), 'Personalized AI recommendations', 200);
       }
 
-      // Fallback to legacy logic
-      $favoritePlaces = $user->favorites()
-        ->where('favoritable_type', Place::class)
-        ->get();
+      $favoritePlaces = Cache::remember("user.{$user->id}.favorites", 3600, function () use ($user) {
+          return $user->favorites()
+            ->where('favoritable_type', Place::class)
+            ->get();
+      });
 
       if ($favoritePlaces->isNotEmpty()) {
         $latestFavoritePlace = $favoritePlaces->last()->favoritable;
         $state = $latestFavoritePlace->state;
 
-        $recommendations = Place::where('state_id', $state->id)
-          ->whereNotIn('id', $favoritePlaces->pluck('favoritable_id')->toArray())
-          ->get()
-          ->random(10);
+        $recommendations = Cache::remember("recommendations.state.{$state->id}.user.{$user->id}", 3600, function () use ($state, $favoritePlaces) {
+            return Place::where('state_id', $state->id)
+              ->whereNotIn('id', $favoritePlaces->pluck('favoritable_id')->toArray())
+              ->get()
+              ->random(10);
+        });
+        
         $recommendedData = PlaceResource::collection($recommendations);
 
         return ApiTrait::data(compact('recommendedData'), '', 200);
       } else {
-        $places = Place::all()->random(10);
+        $places = Cache::remember('recommendations.random.10', 3600, function () {
+            return Place::all()->random(10);
+        });
+
         $recommendedData = PlaceResource::collection($places);
         return ApiTrait::data(compact('recommendedData'), '', 200);
       }

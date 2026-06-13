@@ -60,7 +60,9 @@ class PlaceService extends BaseService
      */
     public function getPlaceById(int $id)
     {
-        return Place::find($id);
+        return $this->remember("id.{$id}", function () use ($id) {
+            return Place::find($id);
+        }, 3600);
     }
 
     /**
