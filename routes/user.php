@@ -14,9 +14,11 @@ use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Api\User\SearchController;
-use App\Http\Controllers\Api\v1\User\Auth\AuthController;
-use App\Http\Controllers\User\ForgetPasswordController;
-use App\Http\Controllers\User\ResetPasswordController;
+use App\Http\Controllers\Api\v1\User\Auth\RegisterController;
+use App\Http\Controllers\Api\v1\User\Auth\LoginController;
+use App\Http\Controllers\Api\v1\User\Auth\LogoutController;
+use App\Http\Controllers\Api\v1\User\Auth\ForgetPasswordController;
+use App\Http\Controllers\Api\v1\User\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\User\RankingController;
 use App\Http\Controllers\Api\User\DiscoverController;
 use App\Http\Controllers\Api\User\QuestController;
@@ -35,15 +37,14 @@ use App\Http\Controllers\Api\User\QuestController;
 
 Route::prefix('v1/user')->group(function () {
   //Auth
-  Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
-  Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
-  Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+  Route::post('/register', RegisterController::class)->middleware('throttle:5,1');
+  Route::post('/login', LoginController::class)->middleware('throttle:5,1');
+  Route::middleware('auth:sanctum')->post('/logout', LogoutController::class);
   Route::middleware('auth:sanctum')->post('/edit_profile', [ProfileUpdateController::class, 'editProfile']);
   Route::middleware('auth:sanctum')->get('/show_profile', [ProfileUpdateController::class, 'show']);
   //Reset_Password
-  Route::post('/forgot_password', [ForgetPasswordController::class, 'fogotPassword'])->middleware('throttle:3,1');
-  Route::put('/reset_password', [ResetPasswordController::class, 'reset'])->middleware('throttle:3,1');
-  Route::put('/reset_pass', [ResetPasswordController::class, 'resets'])->middleware('throttle:3,1');
+  Route::post('/forgot_password', ForgetPasswordController::class)->middleware('throttle:3,1');
+  Route::put('/reset_password', ResetPasswordController::class)->middleware('throttle:3,1');
 
 
   Route::middleware('auth:sanctum')->get('/recommended', [RecommendationController::class, 'recommendPlaces']);

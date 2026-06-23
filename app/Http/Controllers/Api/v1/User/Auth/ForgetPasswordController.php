@@ -1,44 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Api\v1\User\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Services\OtpService;
-use App\Traits\ApiTrait;
-use Illuminate\Support\Facades\Log;
-use Exception;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Actions\Auth\ForgetPasswordAction;
 
 class ForgetPasswordController extends Controller
 {
-  protected OtpService $otpService;
-
-  public function __construct(OtpService $otpService)
+  public function __invoke(ForgotPasswordRequest $request, ForgetPasswordAction $action)
   {
-    $this->otpService = $otpService;
-  }
-
-  public function fogotPassword(Request $request)
-  {
-    try {
-      $request->validate([
-        'email' => 'required|email',
-      ]);
-
-      $user = User::where('email', $request->email)->first();
-      
-      if (!$user) {
-          return ApiTrait::errorMessage([], 'User not found', 404);
-      }
-
-      $this->otpService->send($request->email);
-      
-      return ApiTrait::data([], "OTP sent successfully", 200);
-    } catch (Exception $e) {
-      Log::error('Forgot password error', ['error' => $e->getMessage(), 'email' => $request->email]);
-      return ApiTrait::errorMessage([], 'Failed to send OTP. Please try again.', 500);
-    }
+    return $action->execute($request->validated());
   }
 }
-

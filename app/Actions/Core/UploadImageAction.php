@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Core;
 
 use App\Traits\FileUploadTrait;
 use Illuminate\Http\UploadedFile;
