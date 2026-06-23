@@ -24,36 +24,12 @@ class UserData extends FormRequest
   public function rules(): array
   {
     return [
-      'name' => ['required','string', 'max:150'],
-      'email' => ['required','string', 'max:255', 'unique:users'],
-      'password' => ['required', 'confirmed', Password::defaults()],
+      'name' => ['required', 'string', 'max:150'],
+      'email' => ['required', 'string', 'max:255', 'unique:users'],
+      'password' => ['required', Password::defaults()],
       'image' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
     ];
   }
 
-  public function bodyParameters(): array
-  {
-    return [
-      'name' => [
-        'description' => 'The user\'s name.',
-        'example' => 'John Doe',
-        'required' => true,
-      ],
-      'email' => [
-        'description' => 'The user\'s email address.',
-        'example' => 'john@example.com',
-        'required' => true,
-      ],
-      'password' => [
-        'description' => 'The user\'s password.',
-        'example' => 'securePassword123',
-        'required' => true,
-      ],
-      'password_confirmation' => [
-        'description' => 'Password confirmation (must match password).',
-        'example' => 'securePassword123',
-        'required' => true,
-      ],
-    ];
-  }
+
 }

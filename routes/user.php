@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\Api\User\SearchController;
-use App\Http\Controllers\User\AuthController;
+use App\Http\Controllers\Api\v1\User\Auth\AuthController;
 use App\Http\Controllers\User\ForgetPasswordController;
 use App\Http\Controllers\User\ResetPasswordController;
 use App\Http\Controllers\Api\User\RankingController;
@@ -33,7 +33,7 @@ use App\Http\Controllers\Api\User\QuestController;
 */
 
 
-Route::prefix('user')->group(function () {
+Route::prefix('v1/user')->group(function () {
   //Auth
   Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
   Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
