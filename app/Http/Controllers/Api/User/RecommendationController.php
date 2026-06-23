@@ -58,7 +58,7 @@ class RecommendationController extends Controller
         return ApiTrait::data(compact('recommendedData'), '', 200);
       }
     } catch (\Throwable $th) {
-      return ApiTrait::errorMessage([], '', 404);
+      return response()->json(['error' => $th->getMessage(), 'trace' => $th->getTraceAsString()], 500);
     }
   }
 }
