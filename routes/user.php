@@ -2,13 +2,27 @@
 
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\Guider\GuiderController;
-use App\Http\Controllers\Api\User\TripController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\User\FavoriteController;
 use App\Http\Controllers\Api\v1\User\Place\ListPlacesController;
 use App\Http\Controllers\Api\v1\User\Place\ShowPlaceController;
 use App\Http\Controllers\Api\v1\User\Place\GetPlacesByStateController;
 use App\Http\Controllers\Api\v1\User\Place\CheckInPlaceController;
+use App\Http\Controllers\Api\v1\User\Favorite\GetFavoritesController;
+use App\Http\Controllers\Api\v1\User\Favorite\AddFavoriteController;
+use App\Http\Controllers\Api\v1\User\Favorite\DeleteFavoriteController;
+use App\Http\Controllers\Api\v1\User\Favorite\GetFavoritePlacesController;
+use App\Http\Controllers\Api\v1\User\Favorite\GetFavoriteHotelsController;
+use App\Http\Controllers\Api\v1\User\Review\CreateReviewController;
+use App\Http\Controllers\Api\v1\User\Review\GetPlaceReviewsController;
+use App\Http\Controllers\Api\v1\User\Review\GetHotelReviewsController;
+use App\Http\Controllers\Api\v1\User\Trip\ListTripsController;
+use App\Http\Controllers\Api\v1\User\Trip\CreateTripController;
+use App\Http\Controllers\Api\v1\User\Trip\UpdateTripController;
+use App\Http\Controllers\Api\v1\User\Trip\UploadTripImagesController;
+use App\Http\Controllers\Api\v1\User\Trip\DeleteTripController;
+use App\Http\Controllers\Api\v1\User\Trip\ShowTripController;
+use App\Http\Controllers\Api\v1\User\Profile\UpdateProfileController;
+use App\Http\Controllers\Api\v1\User\Profile\ShowProfileController;
 use App\Http\Controllers\Api\v1\User\Hotel\ListHotelsController;
 use App\Http\Controllers\Api\v1\User\Hotel\ShowHotelController;
 use App\Http\Controllers\Api\v1\User\Hotel\GetHotelsByStateController;
@@ -18,15 +32,13 @@ use App\Http\Controllers\Api\v1\User\Bank\GetBanksByStateController;
 use App\Http\Controllers\Api\v1\User\Restaurant\ListRestaurantsController;
 use App\Http\Controllers\Api\v1\User\Restaurant\ShowRestaurantController;
 use App\Http\Controllers\Api\v1\User\Restaurant\GetRestaurantsByStateController;
-use App\Http\Controllers\Api\User\ProfileUpdateController;
-use App\Http\Controllers\Api\User\ReviewController;
 use App\Http\Controllers\Api\v1\User\Home\HomeController;
 use App\Http\Controllers\Api\v1\User\Recommendation\RecommendPlacesController;
 use App\Http\Controllers\Api\v1\User\Ranking\LeaderboardController;
 use App\Http\Controllers\Api\v1\User\Discover\DiscoverController;
 use App\Http\Controllers\Api\v1\User\Quest\ListQuestsController;
 use App\Http\Controllers\Api\v1\User\Quest\AcceptQuestController;
-use App\Http\Controllers\Api\User\SearchController;
+use App\Http\Controllers\Api\v1\User\Search\SearchController;
 use App\Http\Controllers\Api\v1\User\Auth\RegisterController;
 use App\Http\Controllers\Api\v1\User\Auth\LoginController;
 use App\Http\Controllers\Api\v1\User\Auth\LogoutController;
@@ -50,8 +62,8 @@ Route::prefix('v1/user')->group(function () {
   Route::post('/register', RegisterController::class)->middleware('throttle:5,1');
   Route::post('/login', LoginController::class)->middleware('throttle:5,1');
   Route::middleware('auth:sanctum')->post('/logout', LogoutController::class);
-  Route::middleware('auth:sanctum')->post('/edit_profile', [ProfileUpdateController::class, 'editProfile']);
-  Route::middleware('auth:sanctum')->get('/show_profile', [ProfileUpdateController::class, 'show']);
+  Route::middleware('auth:sanctum')->post('/edit_profile', UpdateProfileController::class);
+  Route::middleware('auth:sanctum')->get('/show_profile', ShowProfileController::class);
   //Reset_Password
   Route::post('/forgot_password', ForgetPasswordController::class)->middleware('throttle:3,1');
   Route::put('/reset_password', ResetPasswordController::class)->middleware('throttle:3,1');
@@ -73,30 +85,31 @@ Route::prefix('v1/user')->group(function () {
   });
 
   //Favorite routes
-  Route::middleware('auth:sanctum')->prefix('favorite')->controller(FavoriteController::class)->group(function () {
-    Route::get('/getFavorites', 'getFavorites');
-    Route::post('/add/{favoritableType}/{favoritableId}', 'addtoFavorites');
-    Route::post('/delete/{favoritableId}', 'deleteFavorites');
-    Route::get('/places_fav', 'places_fav');
-    Route::get('/hotels_fav', 'hotels_fav');
+  Route::middleware('auth:sanctum')->prefix('favorite')->group(function () {
+    Route::get('/getFavorites', GetFavoritesController::class);
+    Route::post('/add/{favoritableType}/{favoritableId}', AddFavoriteController::class);
+    Route::post('/delete/{favoritableId}', DeleteFavoriteController::class);
+    Route::get('/places_fav', GetFavoritePlacesController::class);
+    Route::get('/hotels_fav', GetFavoriteHotelsController::class);
   });
 
   //Review routes
-  Route::middleware('auth:sanctum')->prefix('review')->controller(ReviewController::class)->group(function () {
-    Route::post('/makeReview/{reviewable_type}/{reviewable_id}', 'createReview');
-    Route::get('/getPlaceReview/{place_id}', 'getPlaceReviews');
-    Route::get('/getHotelReview/{hotel_id}', 'getHotelReviews');
+  Route::middleware('auth:sanctum')->prefix('review')->group(function () {
+    Route::post('/makeReview/{reviewable_type}/{reviewable_id}', CreateReviewController::class);
+    Route::get('/getPlaceReview/{place_id}', GetPlaceReviewsController::class);
+    Route::get('/getHotelReview/{hotel_id}', GetHotelReviewsController::class);
   });
 
   //Trip routes
-  Route::middleware("auth:sanctum")->prefix('trip')->controller(TripController::class)->group(function () {
-    Route::get('/get-trip', 'getTrip');
-    Route::post('/create-trip', 'createTrip');
-    Route::post('/update-trip/{id}', 'updateTrip');
-    Route::post('/upload-images/{tripId}', 'uploadImages');
-    Route::post('/delete-trip/{id}', 'deleteTrip');
-    Route::get('/specific-trip/{tripId}', 'specificTrip');
+  Route::middleware('auth:sanctum')->prefix('trip')->group(function () {
+    Route::get('/get-trip', ListTripsController::class);
+    Route::post('/create-trip', CreateTripController::class);
+    Route::post('/update-trip/{id}', UpdateTripController::class);
+    Route::post('/upload-images/{tripId}', UploadTripImagesController::class);
+    Route::post('/delete-trip/{id}', DeleteTripController::class);
+    Route::get('/specific-trip/{tripId}', ShowTripController::class);
   });
+
   //hotel routes
   Route::middleware('auth:sanctum')->prefix('hotel')->group(function () {
     Route::get('/get-hotel/{hotelId}', ShowHotelController::class);
@@ -126,5 +139,6 @@ Route::prefix('v1/user')->group(function () {
     Route::post('/contact_request/{guider_id}', 'createContactRequest');
   });
 
-  Route::get('/search', [SearchController::class, 'search'])->middleware('auth:sanctum');
+  Route::middleware('auth:sanctum')->get('/search', SearchController::class);
 });
+
