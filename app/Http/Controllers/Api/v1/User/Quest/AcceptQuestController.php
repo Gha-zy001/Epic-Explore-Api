@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Http\Controllers\Api\v1\User\Quest;
+
+use App\Actions\Quest\AcceptQuestAction;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class AcceptQuestController extends Controller
+{
+  public function __invoke(Request $request, int $questId, AcceptQuestAction $action)
+  {
+    return $action->execute($request->user(), $questId);
+  }
+}

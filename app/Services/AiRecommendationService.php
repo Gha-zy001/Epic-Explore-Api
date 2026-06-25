@@ -10,11 +10,17 @@ use Illuminate\Support\Facades\Log;
 class AiRecommendationService
 {
     protected string $apiKey;
-    protected string $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    protected string $model;
 
     public function __construct()
     {
         $this->apiKey = env('GEMINI_API_KEY', '');
+        $this->model = env('GEMINI_MODEL', 'gemini-2.5-flash');
+    }
+
+    protected function apiUrl(): string
+    {
+        return "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 
     /**
@@ -42,7 +48,7 @@ class AiRecommendationService
         $prompt = "Based on the user's preference context: '{$context}', please pick the top 5 places from this list: '{$candidates}' that would be most interesting to them. Return ONLY the IDs of the chosen places as a comma-separated list of numbers.";
 
         try {
-            $response = Http::post("{$this->apiUrl}?key={$this->apiKey}", [
+            $response = Http::post("{$this->apiUrl()}?key={$this->apiKey}", [
                 'contents' => [
                     [
                         'parts' => [
